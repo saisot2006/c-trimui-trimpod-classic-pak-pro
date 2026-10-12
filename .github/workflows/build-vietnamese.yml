@@ -17,6 +17,34 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
+
+      - name: Check Vietnamese font glyphs
+        shell: bash
+        run: |
+          set +e
+          echo "=== Available font files ==="
+          find assets/fonts -maxdepth 1 -type f -name '*.fnt' -print
+
+          echo "=== Vietnamese glyph coverage ==="
+          for font in assets/fonts/*.fnt; do
+            [ -f "$font" ] || continue
+            echo "--- $font ---"
+
+            for cp in \
+              0103 00E2 00EA 00F4 01A1 01B0 0111 \
+              1EAF 1EB7 1EA5 1EAD 1EBF 1EC7 \
+              1ED1 1ED9 1EDB 1EE3 1EE9 1EF1; do
+
+              if python3 tools/mergefnt.py \
+                --show "U+$cp" "$font" >/dev/null 2>&1; then
+                echo "PRESENT U+$cp"
+              else
+                echo "MISSING U+$cp"
+              fi
+            done
+          done
+
+
       - name: Build Trimpod
         run: ./build.sh clean
 

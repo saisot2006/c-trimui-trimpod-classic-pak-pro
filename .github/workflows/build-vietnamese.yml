@@ -1,0 +1,31 @@
+
+name: Build Trimpod Vietnamese
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Build Trimpod
+        run: ./build.sh clean
+
+      - name: Package Trimpod
+        run: ./package.sh
+
+      - name: Upload pak
+        uses: actions/upload-artifact@v4
+        with:
+          name: Trimpod-Vietnamese-test
+          path: dist/Trimpod.pak.zip
+          if-no-files-found: error
